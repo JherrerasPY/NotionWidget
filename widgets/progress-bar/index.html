@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progress Bar Widget</title>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .widget {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 18px;
+  }
+  .widget__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #37352f;
+  }
+  .widget__label {
+    font-weight: 600;
+  }
+  .widget__value {
+    font-variant-numeric: tabular-nums;
+    color: #6b7280;
+  }
+  .track {
+    width: 100%;
+    height: 12px;
+    border-radius: 999px;
+    background: #ececea;
+    overflow: hidden;
+  }
+  .fill {
+    height: 100%;
+    border-radius: 999px;
+    background: #2f80ed;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .widget__header { color: #e6e6e5; }
+    .widget__value { color: #9b9a97; }
+    .track { background: #3a3a38; }
+  }
+</style>
+</head>
+<body>
+  <div class="widget">
+    <div class="widget__header">
+      <span class="widget__label" id="label">Progress</span>
+      <span class="widget__value" id="value-text">0%</span>
+    </div>
+    <div class="track">
+      <div class="fill" id="fill"></div>
+    </div>
+  </div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+
+  const value = Math.min(100, Math.max(0, parseFloat(params.get("value")) || 0));
+  const label = params.get("label") || "Progress";
+  const color = params.get("color") ? "#" + params.get("color").replace(/^#/, "") : "#2f80ed";
+  const showPercent = params.get("showPercent") !== "false";
+
+  document.getElementById("label").textContent = label;
+  document.getElementById("fill").style.width = value + "%";
+  document.getElementById("fill").style.background = color;
+  document.getElementById("value-text").textContent = showPercent ? value + "%" : "";
+</script>
+</body>
+</html>
