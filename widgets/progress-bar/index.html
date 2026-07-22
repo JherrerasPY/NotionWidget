@@ -59,12 +59,10 @@
     transition: width 0.4s ease;
   }
 
-  @media (prefers-color-scheme: dark) {
-    .widget__header { color: #e6e6e5; }
-    .widget__value { color: #9b9a97; }
-    .widget__countdown { color: #9b9a97; }
-    .track { background: #3a3a38; }
-  }
+  :root[data-theme="dark"] .widget__header { color: #e6e6e5; }
+  :root[data-theme="dark"] .widget__value { color: #9b9a97; }
+  :root[data-theme="dark"] .widget__countdown { color: #9b9a97; }
+  :root[data-theme="dark"] .track { background: #3a3a38; }
 </style>
 </head>
 <body>
@@ -97,6 +95,12 @@
 
   document.body.style.fontFamily = FONT_STACKS[params.get("font")] || FONT_STACKS.default;
   document.documentElement.style.setProperty("--bar-height", BAR_HEIGHTS[params.get("size")] || BAR_HEIGHTS.medium);
+
+  const themeParam = params.get("theme") || "auto";
+  const theme = themeParam === "auto"
+    ? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+    : themeParam;
+  document.documentElement.setAttribute("data-theme", theme);
 
   const clamp = (n) => Math.min(100, Math.max(0, n));
 

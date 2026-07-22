@@ -165,6 +165,12 @@
           <option value="rounded">Rounded</option>
           <option value="condensed">Condensed</option>
         </select>
+        <label for="theme">Background</label>
+        <select id="theme">
+          <option value="auto" selected>Auto (match device)</option>
+          <option value="light">Bright</option>
+          <option value="dark">Dark</option>
+        </select>
       </fieldset>
     </div>
 
@@ -211,6 +217,7 @@
     p.set("color", el("color").value.replace("#", ""));
     if (el("size").value !== "medium") p.set("size", el("size").value);
     if (el("font").value !== "default") p.set("font", el("font").value);
+    if (el("theme").value !== "auto") p.set("theme", el("theme").value);
     if (!el("showPercent").checked) p.set("showPercent", "false");
     if (el("showCountdown").checked && mode !== "value") p.set("showCountdown", "true");
 

@@ -26,6 +26,7 @@ Each widget is a standalone static page, hosted publicly on GitHub Pages, embedd
 - `label`, `color` (hex, no `#`), `showPercent` (`true`/`false`), `showCountdown` (`true`/`false`, date modes only — renders a live "Xd Xh Xm Xs left" line below the bar, ticking every second; shows "Completed" once past the end date)
 - `font`: `default` | `serif` | `mono` | `rounded` | `condensed` (system font stacks only — no external font loading)
 - `size`: `thin` | `medium` (default) | `thick` (bar thickness)
+- `theme`: `auto` (default, follows browser `prefers-color-scheme`) | `light` | `dark` — overrides text/track colors regardless of system preference, since Notion's per-page light/dark setting is independent of the browser's OS-level setting
 
 ## Conventions
 - Every widget must render sensibly with zero query params (sane defaults).
