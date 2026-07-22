@@ -23,7 +23,7 @@ Each widget is a standalone static page, hosted publicly on GitHub Pages, embedd
 `widgets/progress-bar/index.html?...`
 - `mode`: `value` (default) | `year` | `daterange`
 - `value` (0–100, for `mode=value`), `year` (for `mode=year`, defaults to current year), `startDate`/`endDate` (ISO `YYYY-MM-DD`, for `mode=daterange`)
-- `label`, `color` (hex, no `#`), `showPercent` (`true`/`false`), `showDaysLeft` (`true`/`false`, date modes only)
+- `label`, `color` (hex, no `#`), `showPercent` (`true`/`false`), `showCountdown` (`true`/`false`, date modes only — renders a live "Xd Xh Xm Xs left" line below the bar, ticking every second; shows "Completed" once past the end date)
 - `font`: `default` | `serif` | `mono` | `rounded` | `condensed` (system font stacks only — no external font loading)
 - `size`: `thin` | `medium` (default) | `thick` (bar thickness)
 

@@ -132,7 +132,7 @@
         </div>
 
         <label class="check"><input type="checkbox" id="showPercent" checked> Show percentage</label>
-        <label class="check" id="field-daysleft-toggle"><input type="checkbox" id="showDaysLeft"> Show days left</label>
+        <label class="check" id="field-countdown-toggle"><input type="checkbox" id="showCountdown"> Show countdown (d/h/m/s)</label>
       </fieldset>
 
       <fieldset>
@@ -212,7 +212,7 @@
     if (el("size").value !== "medium") p.set("size", el("size").value);
     if (el("font").value !== "default") p.set("font", el("font").value);
     if (!el("showPercent").checked) p.set("showPercent", "false");
-    if (el("showDaysLeft").checked && mode !== "value") p.set("showDaysLeft", "true");
+    if (el("showCountdown").checked && mode !== "value") p.set("showCountdown", "true");
 
     return p;
   }
@@ -220,7 +220,7 @@
   function render() {
     const mode = el("mode").value;
     Object.entries(fields).forEach(([key, node]) => node.classList.toggle("hidden", key !== mode));
-    el("field-daysleft-toggle").classList.toggle("hidden", mode === "value");
+    el("field-countdown-toggle").classList.toggle("hidden", mode === "value");
 
     const params = buildParams();
     const widgetUrl = new URL("index.html", window.location.href);

@@ -26,6 +26,7 @@
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    gap: 8px;
     margin-bottom: 8px;
     font-size: 14px;
     color: #37352f;
@@ -34,6 +35,12 @@
     font-weight: 600;
   }
   .widget__value {
+    font-variant-numeric: tabular-nums;
+    color: #6b7280;
+  }
+  .widget__countdown {
+    margin-top: 6px;
+    font-size: 12px;
     font-variant-numeric: tabular-nums;
     color: #6b7280;
   }
@@ -55,6 +62,7 @@
   @media (prefers-color-scheme: dark) {
     .widget__header { color: #e6e6e5; }
     .widget__value { color: #9b9a97; }
+    .widget__countdown { color: #9b9a97; }
     .track { background: #3a3a38; }
   }
 </style>
@@ -68,6 +76,7 @@
     <div class="track">
       <div class="fill" id="fill"></div>
     </div>
+    <div class="widget__countdown" id="countdown" style="display: none;"></div>
   </div>
 
 <script>
@@ -75,7 +84,7 @@
   const mode = params.get("mode") || "value";
   const color = params.get("color") ? "#" + params.get("color").replace(/^#/, "") : "#2f80ed";
   const showPercent = params.get("showPercent") !== "false";
-  const showDaysLeft = params.get("showDaysLeft") === "true";
+  const showCountdown = params.get("showCountdown") === "true";
 
   const FONT_STACKS = {
     default: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
@@ -89,7 +98,6 @@
   document.body.style.fontFamily = FONT_STACKS[params.get("font")] || FONT_STACKS.default;
   document.documentElement.style.setProperty("--bar-height", BAR_HEIGHTS[params.get("size")] || BAR_HEIGHTS.medium);
 
-  const MS_PER_DAY = 86400000;
   const clamp = (n) => Math.min(100, Math.max(0, n));
 
   // Malformed/reversed dates fall back to null so callers can default to the static "value" param.
@@ -98,23 +106,38 @@
     const now = Date.now();
     return {
       percent: clamp(((now - start) / (end - start)) * 100),
-      daysLeft: Math.max(0, Math.ceil((end - now) / MS_PER_DAY))
+      remainingMs: end - now
     };
   }
 
+  function formatCountdown(remainingMs) {
+    if (remainingMs <= 0) return "Completed";
+    const pad = (n) => String(n).padStart(2, "0");
+    const totalSeconds = Math.floor(remainingMs / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (days > 0) return `${days}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s left`;
+    if (hours > 0) return `${hours}h ${pad(minutes)}m ${pad(seconds)}s left`;
+    if (minutes > 0) return `${minutes}m ${pad(seconds)}s left`;
+    return `${seconds}s left`;
+  }
+
   function compute() {
-    let value, label, daysLeft = null;
+    let value, label, remainingMs = null;
 
     if (mode === "year") {
       const year = parseInt(params.get("year"), 10) || new Date().getFullYear();
       const result = dateRangeProgress(new Date(year, 0, 1).getTime(), new Date(year + 1, 0, 1).getTime());
       value = result ? result.percent : 0;
-      daysLeft = result ? result.daysLeft : null;
+      remainingMs = result ? result.remainingMs : null;
       label = params.get("label") || (year + " Progress");
     } else if (mode === "daterange") {
       const result = dateRangeProgress(new Date(params.get("startDate")).getTime(), new Date(params.get("endDate")).getTime());
       value = result ? result.percent : clamp(parseFloat(params.get("value")) || 0);
-      daysLeft = result ? result.daysLeft : null;
+      remainingMs = result ? result.remainingMs : null;
       label = params.get("label") || "Progress";
     } else {
       value = clamp(parseFloat(params.get("value")) || 0);
@@ -124,16 +147,19 @@
     document.getElementById("label").textContent = label;
     document.getElementById("fill").style.width = value + "%";
     document.getElementById("fill").style.background = color;
+    document.getElementById("value-text").textContent = showPercent ? Math.round(value) + "%" : "";
 
-    let valueText = showPercent ? Math.round(value) + "%" : "";
-    if (showDaysLeft && daysLeft !== null) {
-      valueText += (valueText ? " · " : "") + daysLeft + (daysLeft === 1 ? " day left" : " days left");
+    const countdownEl = document.getElementById("countdown");
+    if (showCountdown && remainingMs !== null) {
+      countdownEl.textContent = formatCountdown(remainingMs);
+      countdownEl.style.display = "block";
+    } else {
+      countdownEl.style.display = "none";
     }
-    document.getElementById("value-text").textContent = valueText;
   }
 
   compute();
-  setInterval(compute, 60 * 60 * 1000);
+  setInterval(compute, 1000);
 </script>
 </body>
 </html>
