@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Progress Bar Builder</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #fff; --fg: #37352f; --muted: #6b7280; --border: #e3e2e0; --panel: #f7f6f4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #191919; --fg: #e6e6e5; --muted: #9b9a97; --border: #373737; --panel: #232323; }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+  }
+  .page {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 28px; font-size: 14px; }
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  @media (max-width: 720px) {
+    .layout { grid-template-columns: 1fr; }
+  }
+  fieldset {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px 16px;
+    margin: 0 0 16px;
+  }
+  legend { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); padding: 0 4px; }
+  label { display: block; font-size: 13px; margin: 10px 0 4px; }
+  select, input[type="text"], input[type="number"], input[type="date"] {
+    width: 100%;
+    padding: 7px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--fg);
+    font-size: 14px;
+  }
+  input[type="color"] { width: 100%; height: 34px; padding: 2px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); }
+  .row { display: flex; gap: 12px; }
+  .row > div { flex: 1; }
+  .check { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; font-size: 13px; }
+  .check input { width: auto; }
+  .preview-box {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--panel);
+    padding: 4px;
+    margin-bottom: 16px;
+  }
+  iframe { width: 100%; height: 70px; border: 0; display: block; }
+  .url-box textarea {
+    width: 100%;
+    min-height: 70px;
+    resize: vertical;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--fg);
+  }
+  button {
+    margin-top: 8px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--fg);
+    color: var(--bg);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:active { opacity: 0.8; }
+  .hidden { display: none; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Progress Bar Builder</h1>
+  <p class="sub">Configure the bar here, then paste the generated URL into a Notion <code>/embed</code> block. Notion will only ever show the plain bar &mdash; this page is just the configurator.</p>
+
+  <div class="layout">
+    <div>
+      <fieldset>
+        <legend>Progress source</legend>
+        <label for="mode">Mode</label>
+        <select id="mode">
+          <option value="value">Static value</option>
+          <option value="year">Year progress</option>
+          <option value="daterange">Countdown / date range</option>
+        </select>
+
+        <div id="field-value">
+          <label for="value">Value (0&ndash;100)</label>
+          <input type="number" id="value" min="0" max="100" value="50">
+        </div>
+
+        <div id="field-year" class="hidden">
+          <label for="year">Year</label>
+          <input type="number" id="year" value="2026">
+        </div>
+
+        <div id="field-daterange" class="hidden">
+          <div class="row">
+            <div>
+              <label for="startDate">Start date</label>
+              <input type="date" id="startDate">
+            </div>
+            <div>
+              <label for="endDate">End date</label>
+              <input type="date" id="endDate">
+            </div>
+          </div>
+        </div>
+
+        <label class="check"><input type="checkbox" id="showPercent" checked> Show percentage</label>
+        <label class="check" id="field-daysleft-toggle"><input type="checkbox" id="showDaysLeft"> Show days left</label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Label</legend>
+        <label for="label">Text (leave blank for a sensible default)</label>
+        <input type="text" id="label" placeholder="e.g. Reading Goal">
+      </fieldset>
+
+      <fieldset>
+        <legend>Style</legend>
+        <div class="row">
+          <div>
+            <label for="color">Color</label>
+            <input type="color" id="color" value="#2f80ed">
+          </div>
+          <div>
+            <label for="size">Bar thickness</label>
+            <select id="size">
+              <option value="thin">Thin</option>
+              <option value="medium" selected>Medium</option>
+              <option value="thick">Thick</option>
+            </select>
+          </div>
+        </div>
+        <label for="font">Font</label>
+        <select id="font">
+          <option value="default">Default (system sans)</option>
+          <option value="serif">Serif</option>
+          <option value="mono">Monospace</option>
+          <option value="rounded">Rounded</option>
+          <option value="condensed">Condensed</option>
+        </select>
+      </fieldset>
+    </div>
+
+    <div>
+      <fieldset>
+        <legend>Live preview</legend>
+        <div class="preview-box">
+          <iframe id="preview" title="preview"></iframe>
+        </div>
+      </fieldset>
+
+      <fieldset class="url-box">
+        <legend>Embed URL &mdash; paste into Notion's /embed block</legend>
+        <textarea id="url" readonly></textarea>
+        <button id="copy">Copy URL</button>
+      </fieldset>
+    </div>
+  </div>
+</div>
+
+<script>
+  const el = (id) => document.getElementById(id);
+  const fields = { value: el("field-value"), year: el("field-year"), daterange: el("field-daterange") };
+
+  const today = new Date();
+  el("year").value = today.getFullYear();
+  el("startDate").value = today.toISOString().slice(0, 10);
+  const inThreeMonths = new Date(today.getTime() + 90 * 86400000);
+  el("endDate").value = inThreeMonths.toISOString().slice(0, 10);
+
+  function buildParams() {
+    const mode = el("mode").value;
+    const p = new URLSearchParams();
+    p.set("mode", mode);
+
+    if (mode === "value") p.set("value", el("value").value);
+    if (mode === "year") p.set("year", el("year").value);
+    if (mode === "daterange") {
+      p.set("startDate", el("startDate").value);
+      p.set("endDate", el("endDate").value);
+    }
+
+    if (el("label").value.trim()) p.set("label", el("label").value.trim());
+    p.set("color", el("color").value.replace("#", ""));
+    if (el("size").value !== "medium") p.set("size", el("size").value);
+    if (el("font").value !== "default") p.set("font", el("font").value);
+    if (!el("showPercent").checked) p.set("showPercent", "false");
+    if (el("showDaysLeft").checked && mode !== "value") p.set("showDaysLeft", "true");
+
+    return p;
+  }
+
+  function render() {
+    const mode = el("mode").value;
+    Object.entries(fields).forEach(([key, node]) => node.classList.toggle("hidden", key !== mode));
+    el("field-daysleft-toggle").classList.toggle("hidden", mode === "value");
+
+    const params = buildParams();
+    const widgetUrl = new URL("index.html", window.location.href);
+    widgetUrl.search = params.toString();
+
+    el("preview").src = widgetUrl.toString();
+    el("url").value = widgetUrl.toString();
+  }
+
+  document.querySelectorAll("input, select").forEach((node) => node.addEventListener("input", render));
+
+  el("copy").addEventListener("click", () => {
+    navigator.clipboard.writeText(el("url").value);
+    el("copy").textContent = "Copied!";
+    setTimeout(() => (el("copy").textContent = "Copy URL"), 1200);
+  });
+
+  render();
+</script>
+</body>
+</html>
